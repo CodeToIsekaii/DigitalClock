@@ -16,11 +16,17 @@ function DateTimePickerComponent() {
 
   // Hàm để gọi API và lấy dữ liệu JSON
   const fetchAlarmData = () => {
-    return fetch("http://localhost:5000/api/get-alarm")
+    return fetch("https://your-app-name.vercel.app/api/get-alarm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ selectedDateTime }),
+    })
       .then((response) => response.json())
       .then((data) => {
-        setFetchedAlarmData(data); // Lưu JSON nhận được vào trạng thái
-        console.log("Fetched Alarm Data:", data); // In JSON ra console
+        setFetchedAlarmData(data);
+        console.log("Fetched Alarm Data:", data);
       })
       .catch((error) => {
         console.error("Error fetching alarm data:", error);
