@@ -17,6 +17,32 @@ function DateTimePickerComponent() {
     setAlarmTime(new Date(selectedDateTime)); // Lưu thời gian báo thức dưới dạng Date
     setAlarmTriggered(false);
     setAlarmMessage(""); // Reset thông báo
+
+    // Tạo JSON với thời gian báo thức
+    const jsonData = {
+      alarmTime: selectedDateTime.toISOString(), // Chuyển sang định dạng ISO để dễ dàng xử lý
+    };
+
+    console.log("JSON Data to be sent:", JSON.stringify(jsonData)); // In ra JSON để kiểm tra
+
+    // Gửi JSON tới API
+    fetch("http://<YOUR_API_ENDPOINT>/set-alarm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jsonData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Alarm time sent successfully to the API");
+        } else {
+          console.error("Failed to send alarm time to the API");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   useEffect(() => {
