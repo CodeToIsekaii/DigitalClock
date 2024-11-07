@@ -8,9 +8,23 @@ function DateTimePickerComponent() {
   const [alarmTime, setAlarmTime] = useState(null);
   const [alarmTriggered, setAlarmTriggered] = useState(false);
   const [alarmMessage, setAlarmMessage] = useState("");
+  const [fetchedAlarmData, setFetchedAlarmData] = useState(null); // Trạng thái để lưu JSON nhận từ API
 
   const handleDateTimeChange = (newDateTime) => {
     setSelectedDateTime(newDateTime);
+  };
+
+  // Hàm để gọi API và lấy dữ liệu JSON
+  const fetchAlarmData = () => {
+    return fetch("http://localhost:5000/api/get-alarm")
+      .then((response) => response.json())
+      .then((data) => {
+        setFetchedAlarmData(data); // Lưu JSON nhận được vào trạng thái
+        console.log("Fetched Alarm Data:", data); // In JSON ra console
+      })
+      .catch((error) => {
+        console.error("Error fetching alarm data:", error);
+      });
   };
 
   const setAlarm = () => {
@@ -18,31 +32,8 @@ function DateTimePickerComponent() {
     setAlarmTriggered(false);
     setAlarmMessage(""); // Reset thông báo
 
-    // Tạo JSON với thời gian báo thức
-    const jsonData = {
-      alarmTime: selectedDateTime.toISOString(), // Chuyển sang định dạng ISO để dễ dàng xử lý
-    };
-
-    console.log("JSON Data to be sent:", JSON.stringify(jsonData)); // In ra JSON để kiểm tra
-
-    // Gửi JSON tới API
-    fetch("http://<YOUR_API_ENDPOINT>/set-alarm", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(jsonData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log("Alarm time sent successfully to the API");
-        } else {
-          console.error("Failed to send alarm time to the API");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    // Gọi API khi cài đặt báo thức
+    fetchAlarmData();
   };
 
   useEffect(() => {
@@ -108,6 +99,11 @@ function DateTimePickerComponent() {
               OK
             </Button>
           </div>
+        )}
+        {false && fetchedAlarmData && (
+          <Typography variant="body1" style={{ marginTop: "20px" }}>
+            Fetched JSON: {JSON.stringify(fetchedAlarmData)}
+          </Typography>
         )}
       </div>
     </LocalizationProvider>
