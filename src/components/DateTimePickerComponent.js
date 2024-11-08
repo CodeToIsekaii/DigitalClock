@@ -26,7 +26,7 @@ function DateTimePickerComponent() {
   };
 
   const fetchAlarmData = () => {
-    return fetch("https://seahorse-app-x47e7.ondigitalocean.app/get-alarm", {
+    return fetch("https://seahorse-app-x47e7.ondigitalocean.app/post_setting", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
