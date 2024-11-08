@@ -8,20 +8,32 @@ function DateTimePickerComponent() {
   const [alarmTime, setAlarmTime] = useState(null);
   const [alarmTriggered, setAlarmTriggered] = useState(false);
   const [alarmMessage, setAlarmMessage] = useState("");
-  const [fetchedAlarmData, setFetchedAlarmData] = useState(null); // Trạng thái để lưu JSON nhận từ API
+  const [fetchedAlarmData, setFetchedAlarmData] = useState(null);
 
   const handleDateTimeChange = (newDateTime) => {
     setSelectedDateTime(newDateTime);
   };
 
-  // Hàm để gọi API và lấy dữ liệu JSON
+  const formatDateTimeForApi = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year};${month};${day};${hours};${minutes};${seconds}`;
+  };
+
   const fetchAlarmData = () => {
-    return fetch("https://your-app-name.vercel.app/api/get-alarm", {
+    return fetch("https://seahorse-app-x47e7.ondigitalocean.app/get-alarm", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ selectedDateTime }),
+      body: JSON.stringify({
+        date: formatDateTimeForApi(selectedDateTime),
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -34,11 +46,10 @@ function DateTimePickerComponent() {
   };
 
   const setAlarm = () => {
-    setAlarmTime(new Date(selectedDateTime)); // Lưu thời gian báo thức dưới dạng Date
+    setAlarmTime(new Date(selectedDateTime));
     setAlarmTriggered(false);
-    setAlarmMessage(""); // Reset thông báo
+    setAlarmMessage("");
 
-    // Gọi API khi cài đặt báo thức
     fetchAlarmData();
   };
 
@@ -51,24 +62,24 @@ function DateTimePickerComponent() {
         now.getMinutes() === alarmTime.getMinutes() &&
         !alarmTriggered
       ) {
-        setAlarmMessage("Wake up!"); // Hiển thị thông báo khi đến phút đã đặt
-        setAlarmTriggered(true); // Đánh dấu báo thức đã kích hoạt
+        setAlarmMessage("Wake up!");
+        setAlarmTriggered(true);
       }
     };
 
     let intervalId;
 
     if (alarmTime && !alarmTriggered) {
-      intervalId = setInterval(checkAlarm, 1000); // Kiểm tra mỗi giây nhưng chỉ so sánh phút
+      intervalId = setInterval(checkAlarm, 1000);
     }
 
-    return () => clearInterval(intervalId); // Xóa hẹn giờ khi component bị unmount
+    return () => clearInterval(intervalId);
   }, [alarmTime, alarmTriggered]);
 
   const handleDismissAlarm = () => {
     setAlarmMessage("");
-    setAlarmTime(null); // Reset thời gian báo thức
-    setAlarmTriggered(false); // Cho phép đặt lại báo thức
+    setAlarmTime(null);
+    setAlarmTriggered(false);
   };
 
   return (
@@ -92,7 +103,7 @@ function DateTimePickerComponent() {
           variant="contained"
           color="primary"
           onClick={setAlarm}
-          disabled={alarmTime !== null && !alarmTriggered} // Vô hiệu hóa khi đã cài đặt
+          disabled={alarmTime !== null && !alarmTriggered}
         >
           Set Alarm
         </Button>
